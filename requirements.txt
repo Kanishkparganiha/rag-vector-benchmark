@@ -1,0 +1,32 @@
+# Core dependencies
+pinecone-client>=3.0.0
+sentence-transformers>=2.2.0
+transformers>=4.30.0
+torch>=2.0.0
+Pillow>=9.0.0
+openai>=1.0.0
+
+# Data processing
+numpy>=1.24.0
+pandas>=2.0.0
+
+# Visualization
+matplotlib>=3.7.0
+plotly>=5.15.0
+
+# Async and concurrency
+aiohttp>=3.8.0
+asyncio-throttle>=1.0.0
+
+# Utilities
+tqdm>=4.65.0
+python-dotenv>=1.0.0
+faker>=18.0.0
+jupyter>=1.0.0
+
+# Public datasets (HuggingFace)
+datasets>=2.14.0
+huggingface-hub>=0.16.0
+
+# Optional: CLIP for image embeddings (lightweight version)
+open-clip-torch>=2.20.0
