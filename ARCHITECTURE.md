@@ -1008,3 +1008,65 @@ python main.py --datasets wikipedia,squad,coco
 # Synthetic only (faster, no download)
 python main.py --synthetic
 ```
+
+---
+
+## Companion Project: langgraph-rag-agent
+
+`rag-vector-benchmark` is the **ingestion and benchmarking layer**. A separate companion
+project — `langgraph-rag-agent` — is the **intelligent query layer** that sits on top of
+the same Pinecone index.
+
+```
+rag-vector-benchmark              langgraph-rag-agent
+────────────────────              ───────────────────
+Loads HuggingFace / synthetic     Does not touch data
+Generates embeddings              Reuses same embedding model (all-MiniLM-L6-v2)
+Pushes vectors to Pinecone        Reads from Pinecone with metadata filters
+Runs stress tests / benchmarks    benchmark_logger node measures query latency
+```
+
+### What langgraph-rag-agent adds
+
+The original pipeline was linear: query → embed → retrieve → generate. The agent
+replaces this with a **self-correcting LangGraph StateGraph**:
+
+```
+User Query
+    │
+    ▼
+query_classifier (llama3.2:3b) → text / image / hybrid
+    │
+    ├── text_retriever  (Pinecone, filter: type=document_chunk)
+    └── image_retriever (Pinecone, filter: type=image)
+                │
+            merge_docs (dedupe, cap at 5)
+                │
+        relevance_grader (keyword match — pure Python)
+                │
+        ┌───────┼──────────┐
+       yes    no+retry    no+fallback
+        │       │              │
+    generator  query_rewriter  fallback
+        │       │              │
+        └───────┴──────────────┘
+                │
+        benchmark_logger → END
+```
+
+### Shared interface
+
+The Pinecone index `rag-benchmark` (default namespace, cosine similarity, 384-dim) is the
+only shared dependency. The embedding model **must be identical** in both projects —
+vectors indexed with `all-MiniLM-L6-v2` can only be meaningfully searched with the same
+model. The agent uses `text_key="content"` when initialising `PineconeVectorStore` to
+match the `content` metadata field stored during ingestion.
+
+**Quick start for the agent** (after ingestion is complete):
+
+```bash
+cd ../../langgraph-rag-agent
+pip install -r requirements.txt
+# Add PINECONE_API_KEY to .env
+python main.py --demo
+```
