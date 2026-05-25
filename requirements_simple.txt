@@ -1,0 +1,19 @@
+# Minimal requirements for the simple version
+
+# Pinecone vector database
+pinecone-client>=3.0.0
+
+# Text embeddings
+sentence-transformers>=2.2.0
+
+# Load public datasets
+datasets>=2.14.0
+
+# Progress bars
+tqdm>=4.65.0
+
+# Visualization
+matplotlib>=3.7.0
+
+# Jupyter notebook
+jupyter>=1.0.0
