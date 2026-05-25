@@ -641,12 +641,31 @@ python main.py
 # Quick demo with minimal data
 python main.py --demo
 
-# Just ingest data
+# Ingest data only — uses HuggingFace datasets (requires internet)
 python main.py --ingest-only
+
+# Ingest with synthetic data — fast, no HuggingFace token needed
+python main.py --ingest-only --synthetic
 
 # Just run stress tests (assumes data already ingested)
 python main.py --test-only
 ```
+
+> **Tip:** Use `--synthetic` for the first run or when HuggingFace rate limits apply.
+> Synthetic data covers the same topics (Kubernetes, API, Microservices, etc.) without
+> requiring any external downloads.
+
+---
+
+## Companion Project
+
+This repo handles **ingestion only** — embedding and storing vectors in Pinecone.
+
+For intelligent query routing, self-correcting retrieval, and LLM-powered answer
+generation on top of this index, see the companion project:
+
+**[langgraph-rag-agent](../langgraph-rag-agent/)** — LangGraph agentic RAG with
+`llama3.2:3b` via Ollama. Reads from the same `rag-benchmark` Pinecone index.
 
 ---
 
@@ -861,6 +880,13 @@ Without OpenAI, the demo will show mock responses with retrieved context.
 ```bash
 cp .env.example .env
 # Edit .env with your API key
+```
+
+### "ImportError: cannot import name 'Pinecone'"
+The package was renamed from `pinecone-client` to `pinecone`. Fix:
+```bash
+pip uninstall pinecone-client -y
+pip install pinecone>=5.0.0
 ```
 
 ### "Index not found"
